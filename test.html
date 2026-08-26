@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تست GPS</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            background: #0b0b0b;
+            color: #fff;
+            text-align: center;
+        }
+        #status {
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            border: 1px solid #333;
+        }
+        .ok {
+            color: #4caf50;
+        }
+        .err {
+            color: #f44336;
+        }
+        button {
+            padding: 14px 28px;
+            background: #f5c542;
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 12px;
+        }
+        button:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body>
+    <h1>📍 تست GPS</h1>
+    <p>این صفحه فقط موقعیت شما رو نشون میده</p>
+    <button id="getLocation">گرفتن موقعیت</button>
+    <div id="status">⏳ منتظر کلیک...</div>
+
+    <script>
+        document.getElementById('getLocation').addEventListener('click', function() {
+            const status = document.getElementById('status');
+
+            if (!navigator.geolocation) {
+                status.innerHTML = '<span class="err">❌ مرورگر شما GPS پشتیبانی نمی‌کند</span>';
+                return;
+            }
+
+            status.innerHTML = '⏳ در حال گرفتن موقعیت...';
+
+            navigator.geolocation.getCurrentPosition(
+                function(pos) {
+                    const lat = pos.coords.latitude;
+                    const lng = pos.coords.longitude;
+                    const acc = pos.coords.accuracy;
+                    status.innerHTML = `
+                        <span class="ok">✅ موقعیت گرفته شد!</span><br>
+                        عرض جغرافیایی: ${lat}<br>
+                        طول جغرافیایی: ${lng}<br>
+                        دقت: ${Math.round(acc)} متر
+                        <br><br>
+                        <a href="https://www.google.com/maps?q=${lat},${lng}" target="_blank" style="color:#4a9eff;">📍 مشاهده روی گوگل مپ</a>
+                    `;
+                },
+                function(err) {
+                    status.innerHTML = `
+                        <span class="err">❌ خطا: ${err.message}</span><br>
+                        کد خطا: ${err.code}
+                        <br><br>
+                        🔄 مطمئن شو GPS روشن هست و به مرورگر اجازه دادی
+                    `;
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 15000,
+                    maximumAge: 0
+                }
+            );
+        });
+    </script>
+</body>
+</html>
