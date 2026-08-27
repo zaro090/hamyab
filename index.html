@@ -8,8 +8,6 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
     </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.1/peerjs.min.js">
-    </script>
     <style>
         * {
             margin: 0;
@@ -202,21 +200,21 @@
             border: 1px solid #334155;
         }
         .share-box input {
-            width: 80%;
-            padding: 8px;
-            border-radius: 8px;
+            width: 70%;
+            padding: 6px;
+            border-radius: 6px;
             border: 1px solid #334155;
             background: #1e293b;
             color: #fff;
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             text-align: center;
         }
         .share-box button {
-            padding: 8px 16px;
+            padding: 6px 12px;
             background: #f5c542;
             color: #000;
             border: none;
-            border-radius: 8px;
+            border-radius: 6px;
             font-weight: 700;
             cursor: pointer;
         }
@@ -255,12 +253,15 @@
     <div id="toast"></div>
 
     <script>
-        // ===== تنظیمات =====
-        let map, myMarker, myName, myLat, myLng, peer, conn;
+        // ===== تنظیمات JSONBin =====
+        const BIN_ID = "67c8c8e8ad19ca34f877b8e8"; // Bin ID من (رایگان)
+        const API_KEY = "$2a$10$KtE9sM9WZq7n5pQrJxWXvO.gJtXhQZvY9lM8nT4rU2iK3oP5sD6fG"; // کلید API من
+
+        let map, myMarker, myName, myLat, myLng;
         const allUsers = {};
         const userMarkers = {};
         let watchId = null;
-        let isHost = false;
+        let syncInterval = null;
 
         // ===== نقشه =====
         function initMap() {
@@ -372,7 +373,7 @@
                     updateUI();
                     map.setView([myLat, myLng], 16, { animate: true });
                     toast('✅ موقعیت شما ثبت شد');
-                    broadcastLocation();
+                    syncToCloud();
                 },
                 err => toast('❌ خطا: ' + err.message),
                 { enableHighAccuracy: true, timeout: 15000 }
@@ -383,67 +384,68 @@
                     myLng = pos.coords.longitude;
                     allUsers[myName] = { lat: myLat, lng: myLng };
                     updateMarkers();
-                    broadcastLocation();
+                    syncToCloud();
                 },
                 err => console.log('GPS:', err),
                 { enableHighAccuracy: true, timeout: 10000 }
             );
         }
 
-        // ===== PeerJS =====
-        function initPeer() {
-            const id = myName + '-' + Date.now().toString(36);
-            peer = new Peer(id, {
-                debug: 0
-            });
-
-            peer.on('open', () => {
-                toast('🔗 آماده اتصال! ID: ' + id);
-                // نمایش ID برای اتصال دستی
-                console.log('Peer ID:', id);
-            });
-
-            peer.on('connection', (incoming) => {
-                conn = incoming;
-                conn.on('data', (data) => {
-                    handleIncomingData(data);
-                });
-                toast('🔗 کاربر جدید متصل شد!');
-            });
-
-            // اتصال به میزبان (اگر وجود داشته باشد)
-            // سعی می‌کنیم به یک ID ثابت متصل بشیم
-            const hostId = 'hamyab-host';
-            conn = peer.connect(hostId);
-            if (conn) {
-                conn.on('open', () => {
-                    toast('🔗 به سرور متصل شد!');
-                    conn.on('data', (data) => {
-                        handleIncomingData(data);
-                    });
-                });
-            }
+        // ===== ذخیره در JSONBin =====
+        function syncToCloud() {
+            const data = {
+                users: allUsers,
+                timestamp: Date.now()
+            };
+            fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Master-Key': API_KEY
+                },
+                body: JSON.stringify(data)
+            }).catch(err => console.log('Sync error:', err));
         }
 
-        // ===== ارسال موقعیت =====
-        function broadcastLocation() {
-            if (conn && conn.open) {
-                conn.send({
-                    type: 'location',
-                    name: myName,
-                    lat: myLat,
-                    lng: myLng
-                });
-            }
+        // ===== دریافت از JSONBin =====
+        function fetchFromCloud() {
+            fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                headers: {
+                    'X-Master-Key': API_KEY
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                const cloudData = data.record;
+                if (cloudData && cloudData.users) {
+                    let changed = false;
+                    for (let name in cloudData.users) {
+                        if (name !== myName && !allUsers[name]) {
+                            allUsers[name] = cloudData.users[name];
+                            changed = true;
+                        }
+                    }
+                    if (changed) {
+                        updateMarkers();
+                        updateUI();
+                        toast('🔄 اطلاعات از سرور دریافت شد');
+                    }
+                }
+            })
+            .catch(err => console.log('Fetch error:', err));
         }
 
-        // ===== دریافت داده =====
-        function handleIncomingData(data) {
-            if (data.type === 'location' && data.name !== myName) {
-                allUsers[data.name] = { lat: data.lat, lng: data.lng };
-                updateMarkers();
-                updateUI();
-            }
+        // ===== همگام‌سازی دوره‌ای =====
+        function startSync() {
+            // هر ۳ ثانیه از سرور دریافت کن
+            syncInterval = setInterval(() => {
+                fetchFromCloud();
+                // همچنین موقعیت خودت رو دوباره بفرست
+                if (myName && myLat && myLng) {
+                    allUsers[myName] = { lat: myLat, lng: myLng };
+                    syncToCloud();
+                }
+            }, 3000);
         }
 
         // ===== ورود =====
@@ -454,14 +456,15 @@
             myName = name;
             document.getElementById('loginOverlay').style.display = 'none';
             initMap();
-            initPeer();
             startGPS();
+            startSync();
 
             // حذف کاربر هنگام خروج
             window.addEventListener('beforeunload', () => {
                 delete allUsers[myName];
+                syncToCloud();
                 if (watchId) navigator.geolocation.clearWatch(watchId);
-                if (peer) peer.destroy();
+                if (syncInterval) clearInterval(syncInterval);
             });
         }
 
@@ -472,7 +475,7 @@
         document.getElementById('zoomInBtn').addEventListener('click', () => map.zoomIn());
         document.getElementById('zoomOutBtn').addEventListener('click', () => map.zoomOut());
 
-        console.log('🚗 همیاب با PeerJS آماده است!');
+        console.log('🚗 همیاب با JSONBin آماده است!');
     </script>
 </body>
 </html>
