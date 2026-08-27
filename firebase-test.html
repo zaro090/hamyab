@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>تست Firebase</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+</head>
+<body>
+    <h1>📡 تست Firebase</h1>
+    <div id="result">⏳ در حال تست...</div>
+
+    <script>
+        const config = {
+            apiKey: "AIzaSyBV_HPvDFrG7npGtDfA8wrk0XRtq4s5c4k",
+            authDomain: "location-tracker-e732b.firebaseapp.com",
+            projectId: "location-tracker-e732b",
+            storageBucket: "location-tracker-e732b.firebasestorage.app",
+            messagingSenderId: "425589009128",
+            appId: "1:425589009128:web:759e3b6b614434eb75775d"
+        };
+
+        firebase.initializeApp(config);
+        const db = firebase.database();
+
+        const result = document.getElementById('result');
+
+        // تست نوشتن
+        db.ref('test').set({
+            message: 'سلام از دیباگ',
+            time: firebase.database.ServerValue.TIMESTAMP
+        }).then(() => {
+            result.innerHTML = '✅ نوشتن در Firebase موفق بود!';
+            // تست خواندن
+            db.ref('test').on('value', (snap) => {
+                const data = snap.val();
+                if (data) {
+                    result.innerHTML += `<br>📥 داده خوانده شد: ${data.message}`;
+                }
+            });
+        }).catch((error) => {
+            result.innerHTML = `❌ خطا: ${error.message}`;
+        });
+    </script>
+</body>
+</html>
