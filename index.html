@@ -132,6 +132,7 @@
             border-radius: 20px;
             font-size: 0.8rem;
             border: 1px solid #334155;
+            cursor: pointer;
         }
         #toast {
             position: fixed;
@@ -253,15 +254,13 @@
     <div id="toast"></div>
 
     <script>
-        // ===== تنظیمات JSONBin =====
-        const BIN_ID = "67c8c8e8ad19ca34f877b8e8"; // Bin ID من (رایگان)
-        const API_KEY = "$2a$10$KtE9sM9WZq7n5pQrJxWXvO.gJtXhQZvY9lM8nT4rU2iK3oP5sD6fG"; // کلید API من
-
+        // ===== تنظیمات =====
         let map, myMarker, myName, myLat, myLng;
         const allUsers = {};
         const userMarkers = {};
         let watchId = null;
         let syncInterval = null;
+        const channel = new BroadcastChannel('hamyab_channel');
 
         // ===== نقشه =====
         function initMap() {
@@ -373,7 +372,7 @@
                     updateUI();
                     map.setView([myLat, myLng], 16, { animate: true });
                     toast('✅ موقعیت شما ثبت شد');
-                    syncToCloud();
+                    broadcastLocation();
                 },
                 err => toast('❌ خطا: ' + err.message),
                 { enableHighAccuracy: true, timeout: 15000 }
@@ -384,68 +383,73 @@
                     myLng = pos.coords.longitude;
                     allUsers[myName] = { lat: myLat, lng: myLng };
                     updateMarkers();
-                    syncToCloud();
+                    broadcastLocation();
                 },
                 err => console.log('GPS:', err),
                 { enableHighAccuracy: true, timeout: 10000 }
             );
         }
 
-        // ===== ذخیره در JSONBin =====
-        function syncToCloud() {
-            const data = {
-                users: allUsers,
-                timestamp: Date.now()
-            };
-            fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Master-Key': API_KEY
-                },
-                body: JSON.stringify(data)
-            }).catch(err => console.log('Sync error:', err));
+        // ===== ارسال موقعیت از طریق BroadcastChannel =====
+        function broadcastLocation() {
+            if (myName && myLat && myLng) {
+                const data = {
+                    type: 'location',
+                    name: myName,
+                    lat: myLat,
+                    lng: myLng,
+                    timestamp: Date.now()
+                };
+                channel.postMessage(data);
+                // همچنین توی localStorage ذخیره کن
+                const stored = JSON.parse(localStorage.getItem('hamyab_users') || '{}');
+                stored[myName] = { lat: myLat, lng: myLng };
+                localStorage.setItem('hamyab_users', JSON.stringify(stored));
+            }
         }
 
-        // ===== دریافت از JSONBin =====
-        function fetchFromCloud() {
-            fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
-                headers: {
-                    'X-Master-Key': API_KEY
+        // ===== دریافت از BroadcastChannel =====
+        function setupChannelListener() {
+            channel.onmessage = (event) => {
+                const data = event.data;
+                if (data.type === 'location' && data.name !== myName) {
+                    allUsers[data.name] = { lat: data.lat, lng: data.lng };
+                    updateMarkers();
+                    updateUI();
+                    toast(`🔄 دریافت موقعیت از ${data.name}`);
                 }
-            })
-            .then(res => res.json())
-            .then(data => {
-                const cloudData = data.record;
-                if (cloudData && cloudData.users) {
-                    let changed = false;
-                    for (let name in cloudData.users) {
-                        if (name !== myName && !allUsers[name]) {
-                            allUsers[name] = cloudData.users[name];
-                            changed = true;
-                        }
-                    }
-                    if (changed) {
-                        updateMarkers();
-                        updateUI();
-                        toast('🔄 اطلاعات از سرور دریافت شد');
+            };
+        }
+
+        // ===== دریافت از localStorage (برای مرورگرهای دیگه) =====
+        function loadFromStorage() {
+            const stored = localStorage.getItem('hamyab_users');
+            if (stored) {
+                const users = JSON.parse(stored);
+                let changed = false;
+                for (let name in users) {
+                    if (name !== myName && !allUsers[name]) {
+                        allUsers[name] = users[name];
+                        changed = true;
                     }
                 }
-            })
-            .catch(err => console.log('Fetch error:', err));
+                if (changed) {
+                    updateMarkers();
+                    updateUI();
+                }
+            }
         }
 
         // ===== همگام‌سازی دوره‌ای =====
         function startSync() {
-            // هر ۳ ثانیه از سرور دریافت کن
+            // هر ۲ ثانیه از localStorage بخون
             syncInterval = setInterval(() => {
-                fetchFromCloud();
-                // همچنین موقعیت خودت رو دوباره بفرست
+                loadFromStorage();
+                // موقعیت خودت رو دوباره بفرست
                 if (myName && myLat && myLng) {
-                    allUsers[myName] = { lat: myLat, lng: myLng };
-                    syncToCloud();
+                    broadcastLocation();
                 }
-            }, 3000);
+            }, 2000);
         }
 
         // ===== ورود =====
@@ -456,13 +460,17 @@
             myName = name;
             document.getElementById('loginOverlay').style.display = 'none';
             initMap();
+            setupChannelListener();
             startGPS();
             startSync();
+            loadFromStorage();
 
             // حذف کاربر هنگام خروج
             window.addEventListener('beforeunload', () => {
                 delete allUsers[myName];
-                syncToCloud();
+                const stored = JSON.parse(localStorage.getItem('hamyab_users') || '{}');
+                delete stored[myName];
+                localStorage.setItem('hamyab_users', JSON.stringify(stored));
                 if (watchId) navigator.geolocation.clearWatch(watchId);
                 if (syncInterval) clearInterval(syncInterval);
             });
@@ -475,7 +483,8 @@
         document.getElementById('zoomInBtn').addEventListener('click', () => map.zoomIn());
         document.getElementById('zoomOutBtn').addEventListener('click', () => map.zoomOut());
 
-        console.log('🚗 همیاب با JSONBin آماده است!');
+        console.log('🚗 همیاب با BroadcastChannel آماده است!');
+        console.log('📢 کانال: hamyab_channel');
     </script>
 </body>
 </html>
