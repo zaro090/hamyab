@@ -2,219 +2,258 @@
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#0b1220">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#111827">
 <title>همیاب | نقشه زنده</title>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vazirmatn@33.0.4/Vazirmatn-font-face.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{width:100%;height:100%;overflow:hidden;font-family:Vazirmatn,sans-serif;background:#0b1220}
-body{touch-action:manipulation}
-#map{position:fixed;inset:0;width:100%;height:100%;z-index:1}
+html,body,#map{width:100%;height:100%;overflow:hidden}
+body{font-family:Vazirmatn,sans-serif;background:#111827;color:#fff}
+
+#map{position:fixed;inset:0;z-index:1}
 
 #login{
  position:fixed;inset:0;z-index:5000;
  display:flex;align-items:center;justify-content:center;
- padding:22px;
- background:linear-gradient(145deg,#020617,#0f172a);
+ padding:20px;
+ background:rgba(3,7,18,.96);
+ backdrop-filter:blur(18px)
 }
-.login-card{
- width:min(400px,100%);
- background:rgba(15,23,42,.97);
- border:1px solid #334155;
- border-radius:30px;
- padding:32px 22px;
- text-align:center;
- box-shadow:0 30px 100px #000;
+
+.card{
+ width:min(410px,100%);
+ padding:30px 22px;
+ border-radius:28px;
+ background:#111827;
+ border:1px solid #374151;
+ box-shadow:0 25px 80px #000;
+ text-align:center
 }
+
 .logo{
- width:75px;height:75px;margin:auto auto 15px;
+ width:78px;height:78px;margin:auto auto 15px;
  border-radius:24px;
  display:flex;align-items:center;justify-content:center;
- font-size:40px;
- background:linear-gradient(145deg,#f5c542,#d99e00);
+ background:#f5c542;
+ font-size:40px
 }
-.login-card h1{color:#f5c542;font-size:30px;margin-bottom:8px}
-.login-card p{color:#94a3b8;font-size:13px;line-height:2;margin-bottom:20px}
-#name{
- width:100%;padding:16px;
+
+h1{color:#f5c542;font-size:30px;margin-bottom:5px}
+.sub{color:#9ca3af;font-size:13px;line-height:1.9;margin-bottom:22px}
+
+input{
+ width:100%;
+ padding:16px;
  border-radius:16px;
- border:1px solid #334155;
- background:#020617;color:white;
- outline:none;text-align:center;font-size:16px;
- font-family:inherit;
+ border:1px solid #374151;
+ background:#1f2937;
+ color:#fff;
+ outline:none;
+ font:inherit;
+ text-align:center
 }
-#name:focus{border-color:#f5c542}
-#join{
- width:100%;margin-top:12px;padding:16px;
- border:0;border-radius:16px;
- background:#f5c542;color:#111;
- font:bold 16px Vazirmatn;
+
+input:focus{border-color:#f5c542}
+
+.join{
+ width:100%;
+ margin-top:12px;
+ padding:16px;
+ border:0;
+ border-radius:16px;
+ background:#f5c542;
+ color:#111;
+ font:inherit;
+ font-weight:800
 }
-.share{
- margin-top:14px;padding:12px;
- background:#020617;border-radius:14px;
- border:1px solid #334155;
-}
-.share button{
- border:0;border-radius:9px;padding:8px 14px;
- background:#168bd0;color:#fff;
- font-family:inherit;font-weight:bold;
-}
-.share small{display:block;color:#64748b;margin-bottom:8px}
+
+.note{font-size:10px;color:#6b7280;margin-top:14px;line-height:1.8}
 
 .top{
- position:fixed;top:max(12px,env(safe-area-inset-top));
- left:12px;right:12px;z-index:1000;
- display:flex;justify-content:space-between;
- pointer-events:none;
+ position:fixed;
+ top:12px;left:12px;right:12px;
+ z-index:1000;
+ display:flex;
+ justify-content:space-between;
+ pointer-events:none
 }
+
 .brand,.status{
- background:rgba(15,23,42,.93);
- border:1px solid rgba(255,255,255,.1);
+ background:rgba(17,24,39,.92);
+ border:1px solid rgba(255,255,255,.12);
  backdrop-filter:blur(15px);
- box-shadow:0 8px 25px #0005;
- border-radius:18px;padding:9px 13px;
- color:white;font-size:11px;
+ box-shadow:0 8px 30px rgba(0,0,0,.3);
+ border-radius:17px
 }
-.brand strong{color:#f5c542}
-.status{color:#22c55e}
-.status.off{color:#ef4444}
+
+.brand{
+ padding:8px 12px;
+ display:flex;align-items:center;gap:8px
+}
+
+.brandIcon{
+ width:30px;height:30px;
+ border-radius:10px;
+ background:#f5c542;
+ display:flex;align-items:center;justify-content:center
+}
+
+.brandName{color:#f5c542;font-weight:800;font-size:13px}
+.brandSub{font-size:8px;color:#9ca3af}
+
+.status{
+ padding:10px 13px;
+ font-size:10px;
+ color:#d1d5db
+}
+
+.dot{
+ display:inline-block;
+ width:7px;height:7px;
+ border-radius:50%;
+ background:#22c55e;
+ margin-left:5px
+}
+
+.status.offline .dot{background:#ef4444}
 
 .controls{
  position:fixed;
  right:12px;
- bottom:calc(155px + env(safe-area-inset-bottom));
+ bottom:145px;
  z-index:1000;
- display:flex;flex-direction:column;gap:8px;
+ display:flex;
+ flex-direction:column;
+ gap:8px
 }
+
 .ctrl{
- width:46px;height:46px;border-radius:14px;
- border:1px solid #334155;
- background:rgba(15,23,42,.94);
- color:white;font-size:20px;
- box-shadow:0 7px 25px #0006;
+ width:47px;height:47px;
+ border:1px solid rgba(255,255,255,.12);
+ border-radius:15px;
+ background:rgba(17,24,39,.94);
+ color:#fff;
+ font-size:20px;
+ box-shadow:0 7px 25px rgba(0,0,0,.35)
 }
-.ctrl:active{transform:scale(.92)}
+
+#panel{
+ position:fixed;
+ left:12px;right:12px;
+ bottom:12px;
+ z-index:1100;
+ background:rgba(17,24,39,.94);
+ border:1px solid rgba(255,255,255,.1);
+ border-radius:21px;
+ backdrop-filter:blur(20px);
+ box-shadow:0 12px 40px rgba(0,0,0,.4);
+ overflow:hidden
+}
+
+.panelHead{
+ padding:12px 15px;
+ display:flex;
+ justify-content:space-between;
+ font-size:12px;
+ font-weight:700
+}
+
+.online{color:#22c55e}
 
 #users{
- position:fixed;
- left:10px;right:10px;
- bottom:calc(10px + env(safe-area-inset-bottom));
- z-index:1000;
- background:rgba(15,23,42,.95);
- border:1px solid #334155;
- border-radius:20px;
- padding:11px;
- backdrop-filter:blur(18px);
-}
-.users-head{
- display:flex;justify-content:space-between;
- color:#cbd5e1;font-size:11px;margin-bottom:8px;
-}
-#count{color:#22c55e;font-weight:bold}
-#list{
- display:flex;gap:6px;
+ display:flex;
+ gap:7px;
  overflow-x:auto;
- scrollbar-width:none;
+ padding:0 12px 12px;
+ scrollbar-width:none
 }
-#list::-webkit-scrollbar{display:none}
+
+#users::-webkit-scrollbar{display:none}
+
 .user{
  flex:0 0 auto;
  padding:7px 10px;
- border-radius:12px;
- background:#1e293b;
- border:1px solid #334155;
- color:white;font-size:10px;
-}
-.user.online{border-color:#22c55e55}
-.dot{
- display:inline-block;
- width:6px;height:6px;
- border-radius:50%;
- background:#22c55e;
- margin-left:4px;
-}
-#toast{
- position:fixed;
- top:70px;left:50%;
- transform:translateX(-50%);
- z-index:6000;
- background:#111827;
- color:#f5c542;
- border:1px solid #f5c542;
- border-radius:30px;
- padding:9px 17px;
- font-size:11px;
- display:none;
- max-width:90%;
- text-align:center;
-}
-#gps{
- position:fixed;
- bottom:calc(120px + env(safe-area-inset-bottom));
- left:50%;
- transform:translateX(-50%);
- z-index:900;
- display:none;
- background:#0f172acc;
- border:1px solid #334155;
- border-radius:20px;
- padding:4px 10px;
- color:#cbd5e1;
- font-size:9px;
+ border-radius:13px;
+ background:#1f2937;
+ border:1px solid rgba(255,255,255,.07);
+ font-size:10px
 }
 
+.carMarker{background:transparent!important;border:0!important}
+
 .car{
- background:transparent!important;
- border:0!important;
-}
-.car-box{
- width:72px;height:70px;
- display:flex;flex-direction:column;
+ width:76px;
+ height:72px;
+ display:flex;
+ flex-direction:column;
  align-items:center;
- justify-content:center;
+ justify-content:center
 }
-.car-icon{
+
+.carCircle{
  width:42px;height:42px;
  border-radius:50%;
- background:white;
- display:flex;align-items:center;justify-content:center;
+ background:#fff;
+ display:flex;
+ align-items:center;
+ justify-content:center;
  font-size:23px;
  border:3px solid #2563eb;
- box-shadow:0 4px 15px #0008;
+ box-shadow:0 4px 15px rgba(0,0,0,.4)
 }
-.car-icon.me{border-color:#22c55e}
-.car-name{
+
+.carCircle.me{border-color:#22c55e}
+
+.name{
  margin-top:2px;
- background:#0f172af0;
- color:#fff;
- border:1px solid #ffffff22;
+ padding:3px 8px;
  border-radius:12px;
- padding:2px 7px;
+ background:rgba(17,24,39,.94);
+ border:1px solid rgba(255,255,255,.15);
  font-size:8px;
  white-space:nowrap;
- max-width:70px;
+ max-width:75px;
  overflow:hidden;
- text-overflow:ellipsis;
+ text-overflow:ellipsis
 }
+
+#toast{
+ position:fixed;
+ top:75px;
+ left:50%;
+ transform:translateX(-50%);
+ z-index:4000;
+ display:none;
+ max-width:90%;
+ padding:10px 18px;
+ border-radius:25px;
+ background:#111827;
+ border:1px solid #374151;
+ color:#fff;
+ font-size:11px;
+ text-align:center;
+ box-shadow:0 10px 35px #000
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip{
+ background:#111827!important;
+ color:#fff!important
+}
+
 .leaflet-popup-content{
  font-family:Vazirmatn,sans-serif!important;
  text-align:center;
- font-size:12px;
- line-height:2;
-}
-.leaflet-popup-content-wrapper,
-.leaflet-popup-tip{
- background:#0f172a!important;
- color:#fff!important;
+ font-size:11px;
+ line-height:2
 }
 </style>
 </head>
@@ -222,21 +261,19 @@ body{touch-action:manipulation}
 <body>
 
 <div id="login">
- <div class="login-card">
+ <div class="card">
   <div class="logo">🚗</div>
   <h1>همیاب</h1>
-  <p>
-   نقشه زنده چندنفره<br>
-   همه افراد آنلاین را روی یک نقشه ببین
-  </p>
+  <div class="sub">
+   نقشه زنده گروهی<br>
+   موقعیت افرادی که با رضایت خودشان وارد شده‌اند روی نقشه نمایش داده می‌شود.
+  </div>
 
-  <input id="name" maxlength="30" placeholder="نام شما..." autocomplete="off">
+  <input id="name" maxlength="30" placeholder="نام شما...">
+  <button class="join" id="join">🚀 ورود به نقشه</button>
 
-  <button id="join">🚀 ورود به نقشه</button>
-
-  <div class="share">
-   <small>🔗 لینک را برای بقیه بفرست</small>
-   <button id="telegram">📤 ارسال در تلگرام</button>
+  <div class="note">
+   برای نمایش موقعیت شما، اجازه دسترسی به Location گوشی اندروید را تأیید کنید.
   </div>
  </div>
 </div>
@@ -244,36 +281,43 @@ body{touch-action:manipulation}
 <div id="map"></div>
 
 <div class="top">
- <div class="brand">🚗 <strong>همیاب</strong> · نقشه زنده</div>
- <div id="status" class="status">● اتصال</div>
+ <div class="brand">
+  <div class="brandIcon">🚗</div>
+  <div>
+   <div class="brandName">همیاب</div>
+   <div class="brandSub">نقشه زنده</div>
+  </div>
+ </div>
+
+ <div id="status" class="status">
+  <span class="dot"></span>اتصال
+ </div>
 </div>
 
 <div class="controls">
- <button class="ctrl" id="myBtn">📍</button>
- <button class="ctrl" id="allBtn">👥</button>
+ <button class="ctrl" id="me">📍</button>
+ <button class="ctrl" id="all">👥</button>
  <button class="ctrl" id="plus">＋</button>
  <button class="ctrl" id="minus">－</button>
 </div>
 
-<div id="gps">🎯 دقت GPS: <span id="accuracy">--</span> متر</div>
-
-<div id="users">
- <div class="users-head">
-  <span>👥 کاربران روی نقشه</span>
-  <span id="count">۰ نفر</span>
+<div id="panel">
+ <div class="panelHead">
+  <span>👥 افراد روی نقشه</span>
+  <span id="count" class="online">۰ نفر</span>
  </div>
- <div id="list"></div>
+ <div id="users"></div>
 </div>
 
 <div id="toast"></div>
 
 <script>
-/* ===============================
+/* =========================
    FIREBASE
-================================ */
+========================= */
 
 const firebaseConfig={
- apiKey:"AIzaSyBV_HPvDfrG7npGtDfA8wrk0XRtq4s5c4k",
+ apiKey:"AIzaSyBV_HPvDFrG7npGtDfA8wrk0XRtq4s5c4k",
  authDomain:"location-tracker-e732b.firebaseapp.com",
  databaseURL:"https://location-tracker-e732b-default-rtdb.firebaseio.com",
  projectId:"location-tracker-e732b",
@@ -285,9 +329,9 @@ const firebaseConfig={
 firebase.initializeApp(firebaseConfig);
 const db=firebase.database();
 
-/* ===============================
+/* =========================
    VARIABLES
-================================ */
+========================= */
 
 let map=null;
 let myId=null;
@@ -296,38 +340,16 @@ let myLat=null;
 let myLng=null;
 let myAccuracy=null;
 let watchId=null;
+let firstGPS=true;
 
 const locationCache={};
 const markers={};
-const paths={};
 
-let firstGPS=true;
-let toastTimer=null;
-
-/* ===============================
+/* =========================
    HELPERS
-================================ */
+========================= */
 
-function toast(text){
- const el=document.getElementById("toast");
- el.textContent=text;
- el.style.display="block";
- clearTimeout(toastTimer);
- toastTimer=setTimeout(()=>{
-  el.style.display="none";
- },2800);
-}
-
-function escapeHTML(text){
- return String(text)
- .replace(/&/g,"&amp;")
- .replace(/</g,"&lt;")
- .replace(/>/g,"&gt;")
- .replace(/"/g,"&quot;")
- .replace(/'/g,"&#039;");
-}
-
-function createId(){
+function uid(){
  let id=localStorage.getItem("hamyab_uid");
 
  if(!id){
@@ -338,51 +360,52 @@ function createId(){
  return id;
 }
 
+function esc(v){
+ return String(v??"")
+ .replace(/&/g,"&amp;")
+ .replace(/</g,"&lt;")
+ .replace(/>/g,"&gt;")
+ .replace(/"/g,"&quot;")
+ .replace(/'/g,"&#039;");
+}
+
+function toast(msg){
+ const el=document.getElementById("toast");
+ el.textContent=msg;
+ el.style.display="block";
+
+ clearTimeout(el.timer);
+
+ el.timer=setTimeout(()=>{
+  el.style.display="none";
+ },2800);
+}
+
+function online(u){
+ return u &&
+        typeof u.timestamp==="number" &&
+        Date.now()-u.timestamp<120000;
+}
+
 function color(name){
- let hash=0;
+ let h=0;
 
  for(let i=0;i<name.length;i++){
-  hash=name.charCodeAt(i)+((hash<<5)-hash);
+  h=name.charCodeAt(i)+((h<<5)-h);
  }
 
- return `hsl(${Math.abs(hash)%360},75%,52%)`;
+ return `hsl(${Math.abs(h)%360},75%,52%)`;
 }
 
-function distance(a,b,c,d){
- const R=6371000;
- const dLat=(c-a)*Math.PI/180;
- const dLng=(d-b)*Math.PI/180;
-
- const x=
- Math.sin(dLat/2)**2+
- Math.cos(a*Math.PI/180)*
- Math.cos(c*Math.PI/180)*
- Math.sin(dLng/2)**2;
-
- return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
-}
-
-function distanceText(m){
- return m<1000
-  ? Math.round(m)+" متر"
-  : (m/1000).toFixed(1)+" کیلومتر";
-}
-
-function online(user){
- return user &&
-        user.timestamp &&
-        Date.now()-user.timestamp<120000;
-}
-
-/* ===============================
+/* =========================
    MAP
-================================ */
+========================= */
 
 function initMap(){
 
  map=L.map("map",{
   zoomControl:false,
-  preferCanvas:true
+  attributionControl:true
  }).setView([35.6892,51.3890],5);
 
  L.tileLayer(
@@ -394,194 +417,182 @@ function initMap(){
  ).addTo(map);
 }
 
-/* ===============================
-   CAR ICON
-================================ */
+/* =========================
+   ICON
+========================= */
 
-function carIcon(user,me=false){
+function icon(user,isMe){
 
- const c=me?"#22c55e":color(user.name);
+ const c=isMe?"#22c55e":color(user.name||"کاربر");
 
  return L.divIcon({
-  className:"car",
-  iconSize:[72,70],
-  iconAnchor:[36,35],
-  popupAnchor:[0,-32],
+  className:"carMarker",
+  iconSize:[76,72],
+  iconAnchor:[38,36],
+  popupAnchor:[0,-35],
 
   html:`
-   <div class="car-box">
-    <div class="car-icon ${me?"me":""}"
-         style="border-color:${c}">
-      🚗
-    </div>
+   <div class="car">
+    <div
+     class="carCircle ${isMe?"me":""}"
+     style="border-color:${c}"
+    >🚗</div>
 
-    <div class="car-name">
-      <span class="dot"></span>
-      ${escapeHTML(user.name)}
+    <div class="name">
+     ${esc(user.name||"کاربر")}
     </div>
    </div>
   `
  });
 }
 
-/* ===============================
+/* =========================
    POPUP
-================================ */
+========================= */
 
 function popup(user){
 
- let text=
- `<b>${escapeHTML(user.name)}</b>`;
+ const me=user.id===myId;
 
- if(user.id===myId){
-  text+=`<br>🟢 این شما هستید`;
- }
+ let distance="";
 
- text+=`<br>${online(user)?"🟢 آنلاین":"⚪ آخرین موقعیت"}`;
+ if(
+  !me &&
+  myLat!==null &&
+  myLng!==null &&
+  typeof user.lat==="number" &&
+  typeof user.lng==="number"
+ ){
 
- if(myLat!==null &&
-    myLng!==null &&
-    user.id!==myId){
-
-  const d=distance(
+  const d=distanceMeters(
    myLat,myLng,
    user.lat,user.lng
   );
 
-  text+=`<br>📏 فاصله: ${distanceText(d)}`;
+  distance="<br>📏 فاصله: "+formatDistance(d);
  }
 
- if(user.accuracy){
-  text+=`<br>🎯 دقت GPS: ${Math.round(user.accuracy)} متر`;
- }
+ const time=user.timestamp
+  ?new Date(user.timestamp).toLocaleTimeString(
+   "fa-IR",
+   {hour:"2-digit",minute:"2-digit"}
+  )
+  :"نامشخص";
 
- if(user.timestamp){
-  text+=`<br>🕐 ${
-   new Date(user.timestamp)
-   .toLocaleTimeString("fa-IR",{
-    hour:"2-digit",
-    minute:"2-digit",
-    second:"2-digit"
-   })
-  }`;
- }
-
- return text;
+ return `
+ <strong>${esc(user.name||"کاربر")}</strong>
+ ${me?"<br>🟢 این شما هستید":""}
+ <br>${online(user)?"🟢 آنلاین":"⚪ آخرین موقعیت"}
+ ${distance}
+ ${user.accuracy?`<br>🎯 دقت GPS: ${Math.round(user.accuracy)} متر`:""}
+ <br>🕐 ${time}
+ `;
 }
 
-/* ===============================
+/* =========================
+   DISTANCE
+========================= */
+
+function distanceMeters(a,b,c,d){
+
+ const R=6371000;
+
+ const x=(c-a)*Math.PI/180;
+ const y=(d-b)*Math.PI/180;
+
+ const q=
+ Math.sin(x/2)**2+
+ Math.cos(a*Math.PI/180)*
+ Math.cos(c*Math.PI/180)*
+ Math.sin(y/2)**2;
+
+ return R*2*Math.atan2(
+  Math.sqrt(q),
+  Math.sqrt(1-q)
+ );
+}
+
+function formatDistance(m){
+ return m<1000
+  ?Math.round(m)+" متر"
+  :(m/1000).toFixed(1)+" کیلومتر";
+}
+
+/* =========================
    MARKER
-================================ */
+========================= */
 
 function updateMarker(id,user){
 
- if(!user ||
-    typeof user.lat!=="number" ||
-    typeof user.lng!=="number") return;
+ if(
+  !user ||
+  typeof user.lat!=="number" ||
+  typeof user.lng!=="number"
+ )return;
 
- const me=id===myId;
+ const isMe=id===myId;
 
  if(!markers[id]){
 
-  markers[id]=L.marker(
+  const marker=L.marker(
    [user.lat,user.lng],
    {
-    icon:carIcon(user,me),
-    zIndexOffset:me?2000:0
+    icon:icon(user,isMe),
+    zIndexOffset:isMe?2000:0
    }
   ).addTo(map);
 
-  markers[id].bindPopup(popup(user));
+  marker.bindPopup(popup(user));
 
-  paths[id]=L.polyline(
-   [[user.lat,user.lng]],
-   {
-    color:me?"#22c55e":color(user.name),
-    weight:3,
-    opacity:.4
-   }
-  ).addTo(map);
+  markers[id]=marker;
 
  }else{
 
-  const marker=markers[id];
+  markers[id].setLatLng([
+   user.lat,
+   user.lng
+  ]);
 
-  const old=marker.getLatLng();
+  markers[id].setIcon(
+   icon(user,isMe)
+  );
 
-  const newLat=
-   old.lat+(user.lat-old.lat)*.5;
-
-  const newLng=
-   old.lng+(user.lng-old.lng)*.5;
-
-  marker.setLatLng([newLat,newLng]);
-
-  marker.setIcon(carIcon(user,me));
-
-  marker.setPopupContent(popup(user));
-
-  const path=paths[id];
-
-  if(path){
-
-   const points=path.getLatLngs();
-
-   const last=points[points.length-1];
-
-   if(
-    !last ||
-    distance(
-     last.lat,last.lng,
-     user.lat,user.lng
-    )>5
-   ){
-
-    points.push([user.lat,user.lng]);
-
-    if(points.length>300)
-     points.shift();
-
-    path.setLatLngs(points);
-   }
-  }
+  markers[id].setPopupContent(
+   popup(user)
+  );
  }
 }
 
-/* ===============================
+/* =========================
    REMOVE
-================================ */
+========================= */
 
-function removeUserMarker(id){
+function removeMarker(id){
 
  if(markers[id]){
-  map.removeLayer(markers[id]);
-  delete markers[id];
- }
 
- if(paths[id]){
-  map.removeLayer(paths[id]);
-  delete paths[id];
+  map.removeLayer(markers[id]);
+
+  delete markers[id];
  }
 }
 
-/* ===============================
-   UI
-================================ */
+/* =========================
+   USER LIST
+========================= */
 
 function updateUsers(){
 
- const list=document.getElementById("list");
+ const box=document.getElementById("users");
  const count=document.getElementById("count");
 
  const users=Object.values(locationCache);
 
- const onlineUsers=
- users.filter(u=>online(u));
+ const onlineUsers=users.filter(online);
 
- count.textContent=
- onlineUsers.length+" نفر";
+ count.textContent=onlineUsers.length+" نفر";
 
- list.innerHTML="";
+ box.innerHTML="";
 
  users
  .sort((a,b)=>Number(online(b))-Number(online(a)))
@@ -589,15 +600,18 @@ function updateUsers(){
 
   const el=document.createElement("div");
 
-  el.className=
-   "user "+(online(user)?"online":"");
+  el.className="user";
 
-  el.innerHTML=
-   `<span class="dot"></span>${escapeHTML(user.name)}`;
+  el.textContent=
+   (online(user)?"🟢 ":"⚪ ")+
+   (user.name||"کاربر");
 
   el.onclick=()=>{
 
-   if(typeof user.lat==="number"){
+   if(
+    typeof user.lat==="number" &&
+    typeof user.lng==="number"
+   ){
 
     map.setView(
      [user.lat,user.lng],
@@ -605,54 +619,51 @@ function updateUsers(){
      {animate:true}
     );
 
-    if(markers[user.id])
+    if(markers[user.id]){
      markers[user.id].openPopup();
+    }
    }
   };
 
-  list.appendChild(el);
+  box.appendChild(el);
  });
 
  if(!users.length){
 
-  list.innerHTML=
-   `<span style="color:#64748b;font-size:10px">
-     هنوز کسی روی نقشه نیست
-   </span>`;
+  box.innerHTML=
+   `<div style="font-size:10px;color:#9ca3af">
+    هنوز کاربری روی نقشه نیست
+   </div>`;
  }
 }
 
-/* ===============================
-   FIREBASE LISTENER
-================================ */
+/* =========================
+   REALTIME LISTENER
+   این قسمت مشکل نسخه قبلی را حل می‌کند
+========================= */
 
 function listenLocations(){
 
  db.ref("locations").on(
   "value",
+
   snapshot=>{
 
    const data=snapshot.val()||{};
 
-   /*
-    مهم:
-    اینجا locationCache واقعاً
-    با کاربران Firebase پر می‌شود.
-   */
-
-   Object.keys(locationCache)
-   .forEach(id=>{
+   /* حذف کاربران دیگر که از Firebase حذف شده‌اند */
+   Object.keys(locationCache).forEach(id=>{
 
     if(!data[id]){
 
      delete locationCache[id];
 
-     removeUserMarker(id);
+     removeMarker(id);
     }
    });
 
-   Object.keys(data)
-   .forEach(id=>{
+   /* دریافت تک تک کاربران */
+   Object.keys(data).forEach(id=>{
 
     const loc=data[id];
 
@@ -660,7 +671,14 @@ function listenLocations(){
      !loc ||
      typeof loc.lat!=="number" ||
      typeof loc.lng!=="number"
-    ) return;
+    ){
+     return;
+    }
+
+    /*
+      نکته مهم:
+      اطلاعات کاربر دیگر اینجا وارد locationCache می‌شود.
+    */
 
     locationCache[id]={
      id:id,
@@ -668,7 +686,10 @@ function listenLocations(){
      lat:loc.lat,
      lng:loc.lng,
      accuracy:loc.accuracy||null,
-     timestamp:loc.timestamp||0
+     timestamp:
+      typeof loc.timestamp==="number"
+      ?loc.timestamp
+      :0
     };
 
     updateMarker(
@@ -678,26 +699,31 @@ function listenLocations(){
    });
 
    updateUsers();
-
   },
+
   error=>{
    console.error(error);
-   toast("❌ خطا در ارتباط با Firebase");
+   toast("❌ خطا در دریافت اطلاعات");
   }
  );
 }
 
-/* ===============================
+/* =========================
    SEND LOCATION
-================================ */
+========================= */
 
-let lastSent=0;
 let lastLat=null;
 let lastLng=null;
+let lastTime=0;
 
 function sendLocation(){
 
- if(!myId || myLat===null) return;
+ if(
+  !myId ||
+  !myName ||
+  myLat===null ||
+  myLng===null
+ )return;
 
  const now=Date.now();
 
@@ -705,50 +731,55 @@ function sendLocation(){
 
  if(lastLat!==null){
 
-  moved=distance(
-   lastLat,lastLng,
-   myLat,myLng
+  moved=distanceMeters(
+   lastLat,
+   lastLng,
+   myLat,
+   myLng
   );
  }
 
  /*
-  حداقل هر ۳ ثانیه یا وقتی
-  بیشتر از ۵ متر حرکت کرده‌ای
-  ارسال می‌کنیم.
+   هر 5 ثانیه یا بعد از حداقل 5 متر
  */
-
  if(
-  now-lastSent<3000 &&
+  now-lastTime<5000 &&
   moved<5
- ) return;
+ ){
+  return;
+ }
 
- lastSent=now;
  lastLat=myLat;
  lastLng=myLng;
+ lastTime=now;
 
- db.ref("locations/"+myId)
- .set({
+ db.ref(
+  "locations/"+myId
+ ).set({
+
   id:myId,
   name:myName,
   lat:myLat,
   lng:myLng,
   accuracy:myAccuracy,
-  timestamp:firebase.database.ServerValue.TIMESTAMP
- })
- .catch(err=>{
+  timestamp:
+   firebase.database.ServerValue.TIMESTAMP
+
+ }).catch(err=>{
   console.error(err);
+  toast("❌ ارسال موقعیت انجام نشد");
  });
 }
 
-/* ===============================
+/* =========================
    GPS
-================================ */
+========================= */
 
 function startGPS(){
 
  if(!navigator.geolocation){
 
-  toast("❌ GPS در این مرورگر موجود نیست");
+  toast("❌ GPS این مرورگر در دسترس نیست");
   return;
  }
 
@@ -759,37 +790,30 @@ function startGPS(){
  };
 
  navigator.geolocation.getCurrentPosition(
-  handleGPS,
+  positionReceived,
   gpsError,
   options
  );
 
  watchId=
  navigator.geolocation.watchPosition(
-  handleGPS,
+  positionReceived,
   gpsError,
   options
  );
 }
 
-function handleGPS(pos){
+function positionReceived(pos){
 
  myLat=pos.coords.latitude;
  myLng=pos.coords.longitude;
  myAccuracy=pos.coords.accuracy;
 
- document.getElementById("gps")
- .style.display="block";
-
- document.getElementById("accuracy")
- .textContent=Math.round(myAccuracy);
-
  /*
-  موقعیت خودمان را فوری در cache قرار می‌دهیم
-  تا حتی قبل از برگشت Firebase روی نقشه دیده شویم.
+   اول اطلاعات خودمان را محلی هم وارد cache می‌کنیم
+   تا بلافاصله روی نقشه دیده شویم.
  */
-
- const me={
+ locationCache[myId]={
   id:myId,
   name:myName,
   lat:myLat,
@@ -798,9 +822,10 @@ function handleGPS(pos){
   timestamp:Date.now()
  };
 
- locationCache[myId]=me;
-
- updateMarker(myId,me);
+ updateMarker(
+  myId,
+  locationCache[myId]
+ );
 
  updateUsers();
 
@@ -816,38 +841,49 @@ function handleGPS(pos){
    {animate:true}
   );
 
-  toast("✅ موقعیت شما پیدا شد");
+  toast(
+   "✅ موقعیت شما ثبت شد"
+  );
  }
 }
 
 function gpsError(err){
 
- console.warn("GPS error",err);
+ console.warn("GPS",err);
 
- if(err.code===1)
-  toast("❌ اجازه GPS را برای مرورگر فعال کن");
+ if(err.code===1){
 
- else if(err.code===2)
-  toast("⚠️ موقعیت GPS پیدا نشد");
+  toast(
+   "❌ اجازه Location داده نشده است"
+  );
 
- else if(err.code===3)
-  toast("⚠️ دریافت GPS طول کشید");
+ }else if(err.code===2){
+
+  toast(
+   "⚠️ موقعیت GPS در دسترس نیست"
+  );
+
+ }else if(err.code===3){
+
+  toast(
+   "⚠️ دریافت GPS طول کشید"
+  );
+ }
 }
 
-/* ===============================
+/* =========================
    PRESENCE
-================================ */
+========================= */
 
 function setupPresence(){
 
  const ref=
- db.ref("locations/"+myId);
+  db.ref("locations/"+myId);
 
  /*
-  وقتی اتصال قطع شود،
-  Firebase خودش کاربر را حذف می‌کند.
+   وقتی اتصال اینترنت قطع شد،
+   رکورد کاربر حذف می‌شود.
  */
-
  ref.onDisconnect()
  .remove()
  .catch(console.error);
@@ -855,39 +891,66 @@ function setupPresence(){
  db.ref(".info/connected")
  .on("value",snap=>{
 
-  const status=
-   document.getElementById("status");
+  if(snap.val()!==true)return;
+
+  ref.set({
+
+   id:myId,
+   name:myName,
+   lat:myLat||0,
+   lng:myLng||0,
+   accuracy:myAccuracy||null,
+   timestamp:
+    firebase.database.ServerValue.TIMESTAMP
+
+  }).catch(console.error);
+ });
+}
+
+/* =========================
+   CONNECTION
+========================= */
+
+function setupConnection(){
+
+ const status=
+  document.getElementById("status");
+
+ db.ref(".info/connected")
+ .on("value",snap=>{
 
   if(snap.val()===true){
 
-   status.classList.remove("off");
-   status.textContent="● آنلاین";
+   status.classList.remove("offline");
 
-   /*
-    اگر دوباره اینترنت وصل شد،
-    موقعیت را دوباره ثبت کن.
-   */
-
-   if(myLat!==null)
-    sendLocation();
+   status.innerHTML=
+    '<span class="dot"></span>آنلاین';
 
   }else{
 
-   status.classList.add("off");
-   status.textContent="● قطع اتصال";
+   status.classList.add("offline");
+
+   status.innerHTML=
+    '<span class="dot"></span>قطع اتصال';
   }
  });
 }
 
-/* ===============================
+/* =========================
    BUTTONS
-================================ */
+========================= */
 
 function myLocation(){
 
- if(myLat===null){
+ if(
+  myLat===null ||
+  myLng===null
+ ){
 
-  toast("⏳ هنوز GPS پیدا نشده");
+  toast(
+   "⏳ هنوز موقعیت GPS دریافت نشده"
+  );
+
   return;
  }
 
@@ -897,23 +960,31 @@ function myLocation(){
   {animate:true}
  );
 
- if(markers[myId])
+ if(markers[myId]){
   markers[myId].openPopup();
+ }
 }
 
 function showAll(){
 
  const points=
- Object.values(locationCache)
- .filter(u=>
-  online(u) &&
-  typeof u.lat==="number"
- )
- .map(u=>[u.lat,u.lng]);
+  Object.values(locationCache)
+  .filter(u=>
+   online(u) &&
+   typeof u.lat==="number" &&
+   typeof u.lng==="number"
+  )
+  .map(u=>[
+   u.lat,
+   u.lng
+  ]);
 
  if(!points.length){
 
-  toast("👥 کاربر آنلاینی پیدا نشد");
+  toast(
+   "👥 کاربر آنلاینی پیدا نشد"
+  );
+
   return;
  }
 
@@ -931,47 +1002,49 @@ function showAll(){
  map.fitBounds(
   L.latLngBounds(points),
   {
-   padding:[80,80],
+   padding:[90,90],
    maxZoom:16,
    animate:true
   }
  );
 }
 
-/* ===============================
-   TELEGRAM
-================================ */
+/* =========================
+   CLEANUP
+========================= */
 
-function shareTelegram(){
+function cleanup(){
 
- const url=
- "https://zaro090.github.io/hamyab/";
+ if(watchId!==null){
 
- const text=
- "🚗 همیاب | نقشه زنده\n\n"+
- "با این لینک وارد شو تا همه روی یک نقشه همدیگر را ببینیم:\n"+
- url;
+  navigator.geolocation
+  .clearWatch(watchId);
+ }
 
- window.open(
-  "https://t.me/share/url?url="+
-  encodeURIComponent(url)+
-  "&text="+
-  encodeURIComponent(text),
-  "_blank"
- );
+ /*
+   حذف مستقیم هنگام خروج ممکن است در بعضی مرورگرها
+   اجرا نشود؛ onDisconnect راه مطمئن‌تر است.
+ */
 }
 
-/* ===============================
+/* =========================
    JOIN
-================================ */
+========================= */
 
 function join(){
 
  const input=
- document.getElementById("name");
+  document.getElementById("name");
 
  const name=
- input.value.trim();
+  input.value.trim();
+
+ if(!name){
+
+  toast("❌ نام خود را وارد کن");
+  input.focus();
+  return;
+ }
 
  if(name.length<2){
 
@@ -980,12 +1053,15 @@ function join(){
  }
 
  myName=name;
- myId=createId();
+ myId=uid();
 
- document.getElementById("login")
- .style.display="none";
+ document.getElementById(
+  "login"
+ ).style.display="none";
 
  initMap();
+
+ setupConnection();
 
  setupPresence();
 
@@ -993,60 +1069,90 @@ function join(){
 
  startGPS();
 
- toast("👋 خوش آمدی "+name);
+ toast(
+  "👋 خوش آمدی "+myName
+ );
 }
 
-/* ===============================
+/* =========================
    EVENTS
-================================ */
+========================= */
 
 document
- .getElementById("join")
- .onclick=join;
+.getElementById("join")
+.addEventListener(
+ "click",
+ join
+);
 
 document
- .getElementById("name")
- .addEventListener(
-  "keydown",
-  e=>{
-   if(e.key==="Enter") join();
+.getElementById("name")
+.addEventListener(
+ "keydown",
+ e=>{
+  if(e.key==="Enter"){
+   join();
   }
- );
-
-document
- .getElementById("myBtn")
- .onclick=myLocation;
-
-document
- .getElementById("allBtn")
- .onclick=showAll;
-
-document
- .getElementById("plus")
- .onclick=()=>map.zoomIn();
-
-document
- .getElementById("minus")
- .onclick=()=>map.zoomOut();
-
-document
- .getElementById("telegram")
- .onclick=shareTelegram;
-
-/*
-  هنگام خروج از صفحه، watch GPS متوقف شود.
-  حذف اصلی کاربر را Firebase onDisconnect انجام می‌دهد.
- */
-
-window.addEventListener(
- "beforeunload",
- ()=>{
-  if(watchId!==null)
-   navigator.geolocation.clearWatch(watchId);
  }
 );
 
-console.log("🚗 HAMYAB LIVE MAP READY");
+document
+.getElementById("me")
+.addEventListener(
+ "click",
+ myLocation
+);
+
+document
+.getElementById("all")
+.addEventListener(
+ "click",
+ showAll
+);
+
+document
+.getElementById("plus")
+.addEventListener(
+ "click",
+ ()=>{
+  if(map)map.zoomIn();
+ }
+);
+
+document
+.getElementById("minus")
+.addEventListener(
+ "click",
+ ()=>{
+  if(map)map.zoomOut();
+ }
+);
+
+window.addEventListener(
+ "beforeunload",
+ cleanup
+);
+
+/*
+  اگر کاربر تب را دوباره باز کرد،
+  GPS دوباره فعال شود.
+*/
+document.addEventListener(
+ "visibilitychange",
+ ()=>{
+  if(
+   document.visibilityState==="visible" &&
+   myId &&
+   watchId===null
+  ){
+   startGPS();
+  }
+ }
+);
+
+console.log(
+ "🚗 همیاب | Realtime Map"
+);
 </script>
 
 </body>
