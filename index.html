@@ -71,10 +71,6 @@
             margin-bottom: 16px;
             text-align: center;
         }
-        .loginCard input:focus {
-            border-color: #f5c542;
-            outline: none;
-        }
         .loginCard button {
             width: 100%;
             padding: 16px;
@@ -85,7 +81,6 @@
             font-size: 1rem;
             font-weight: 700;
             cursor: pointer;
-            font-family: inherit;
         }
         .controls {
             position: fixed;
@@ -135,7 +130,6 @@
             font-size: 0.7rem;
             border: 1px solid #334155;
             cursor: pointer;
-            white-space: nowrap;
         }
         #toast {
             position: fixed;
@@ -177,7 +171,6 @@
         }
         .car-circle.me {
             border-color: #22c55e;
-            box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
         }
         .car-name {
             margin-top: 2px;
@@ -217,7 +210,6 @@
             border-radius: 6px;
             font-weight: 700;
             cursor: pointer;
-            font-size: 0.7rem;
         }
         .online-count {
             color: #22c55e;
@@ -269,15 +261,10 @@
     <div id="toast"></div>
 
     <script>
-        // ===== تنظیمات JSONBin =====
-        const BIN_ID = "67c8c8e8ad19ca34f877b8e8";
-        const API_KEY = "$2a$10$KtE9sM9WZq7n5pQrJxWXvO.gJtXhQZvY9lM8nT4rU2iK3oP5sD6fG";
-
         let map, myName, myLat, myLng;
         const allUsers = {};
         const userMarkers = {};
         let watchId = null;
-        let syncInterval = null;
         let isFirstLocation = true;
 
         // ===== نقشه =====
@@ -353,7 +340,6 @@
         // ===== آپدیت مارکرها =====
         function updateMarkers() {
             const now = Date.now();
-            // حذف کاربران آفلاین (بیشتر از ۱۵ ثانیه)
             for (let name in allUsers) {
                 if (now - allUsers[name].timestamp > 15000) {
                     delete allUsers[name];
@@ -363,7 +349,6 @@
                     }
                 }
             }
-            // افزودن/به‌روزرسانی مارکرها
             for (let name in allUsers) {
                 const user = allUsers[name];
                 if (!user.lat || !user.lng) continue;
@@ -390,7 +375,8 @@
                 pos => {
                     myLat = pos.coords.latitude;
                     myLng = pos.coords.longitude;
-                    sendLocation();
+                    allUsers[myName] = { lat: myLat, lng: myLng, timestamp: Date.now() };
+                    updateMarkers();
                     if (isFirstLocation) {
                         map.setView([myLat, myLng], 15, { animate: true });
                         isFirstLocation = false;
@@ -404,60 +390,29 @@
                 pos => {
                     myLat = pos.coords.latitude;
                     myLng = pos.coords.longitude;
-                    sendLocation();
+                    allUsers[myName] = { lat: myLat, lng: myLng, timestamp: Date.now() };
+                    updateMarkers();
                 },
                 err => console.log('GPS:', err),
                 { enableHighAccuracy: true, timeout: 10000 }
             );
         }
 
-        // ===== ارسال به JSONBin =====
-        function sendLocation() {
-            if (!myName || myLat === undefined || myLng === undefined) return;
-            allUsers[myName] = { lat: myLat, lng: myLng, timestamp: Date.now() };
-            updateMarkers();
-            const data = { users: allUsers, timestamp: Date.now() };
-            fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Master-Key': API_KEY
-                },
-                body: JSON.stringify(data)
-            }).catch(err => console.log('Sync error:', err));
-        }
-
-        // ===== دریافت از JSONBin =====
-        function fetchFromCloud() {
-            fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
-                headers: { 'X-Master-Key': API_KEY }
-            })
-            .then(res => res.json())
-            .then(data => {
-                const cloudData = data.record;
-                if (cloudData && cloudData.users) {
-                    for (let name in cloudData.users) {
-                        const user = cloudData.users[name];
-                        if (user.lat && user.lng) {
-                            allUsers[name] = user;
-                        }
+        // ===== همگام‌سازی با localStorage =====
+        function syncWithStorage() {
+            // ذخیره در localStorage
+            localStorage.setItem('hamyab_users', JSON.stringify(allUsers));
+            // خواندن از localStorage
+            const data = localStorage.getItem('hamyab_users');
+            if (data) {
+                const users = JSON.parse(data);
+                for (let name in users) {
+                    if (!allUsers[name]) {
+                        allUsers[name] = users[name];
                     }
-                    updateMarkers();
                 }
-            })
-            .catch(err => console.log('Fetch error:', err));
-        }
-
-        // ===== همگام‌سازی دوره‌ای =====
-        function startSync() {
-            fetchFromCloud();
-            syncInterval = setInterval(() => {
-                fetchFromCloud();
-                if (myName && myLat !== undefined && myLng !== undefined) {
-                    allUsers[myName] = { lat: myLat, lng: myLng, timestamp: Date.now() };
-                    updateMarkers();
-                }
-            }, 3000);
+                updateMarkers();
+            }
         }
 
         // ===== نمایش همه =====
@@ -485,8 +440,6 @@
             if (myLat !== undefined && myLng !== undefined) {
                 map.setView([myLat, myLng], 17, { animate: true });
                 toast('📍 رفتن به موقعیت شما');
-            } else {
-                toast('⏳ موقعیت شما هنوز ثبت نشده');
             }
         }
 
@@ -499,11 +452,13 @@
             document.getElementById('loginOverlay').style.display = 'none';
             initMap();
             startGPS();
-            startSync();
+
+            // همگام‌سازی با localStorage هر ۳ ثانیه
+            setInterval(syncWithStorage, 3000);
 
             window.addEventListener('beforeunload', () => {
                 if (watchId) navigator.geolocation.clearWatch(watchId);
-                if (syncInterval) clearInterval(syncInterval);
+                localStorage.setItem('hamyab_users', JSON.stringify(allUsers));
             });
         }
 
@@ -515,8 +470,7 @@
         document.getElementById('zoomInBtn').addEventListener('click', () => map.zoomIn());
         document.getElementById('zoomOutBtn').addEventListener('click', () => map.zoomOut());
 
-        console.log('🚗 همیاب برای ۱۰ ماشین آماده است!');
-        console.log('📌 همه با همین لینک وارد بشن: https://zaro090.github.io/hamyab/');
+        console.log('🚗 همیاب با localStorage آماده است!');
     </script>
 </body>
 </html>
