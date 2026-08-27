@@ -2,123 +2,103 @@
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#111827">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0f172a">
 <title>همیاب | نقشه زنده</title>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vazirmatn@33.0.4/Vazirmatn-font-face.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
 <style>
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+*{box-sizing:border-box;margin:0;padding:0}
 html,body,#map{width:100%;height:100%;overflow:hidden}
-body{font-family:Vazirmatn,sans-serif;background:#0b1220;color:#fff}
-button,input{font-family:inherit}
+body{font-family:Vazirmatn,sans-serif;background:#0f172a;color:white}
 
-#map{position:fixed;inset:0;z-index:1}
+#map{position:fixed;inset:0}
 
-#loginOverlay{
+#login{
 position:fixed;inset:0;z-index:5000;
 display:flex;align-items:center;justify-content:center;
 padding:20px;
-background:rgba(3,7,18,.96);
-backdrop-filter:blur(20px)
+background:rgba(2,6,23,.96);
+backdrop-filter:blur(15px)
 }
 
-.loginCard{
-width:min(410px,100%);
-padding:32px 24px;
-border-radius:30px;
+.card{
+width:min(390px,100%);
 background:#111827;
-border:1px solid rgba(255,255,255,.1);
-box-shadow:0 30px 100px rgba(0,0,0,.65);
-text-align:center
+border:1px solid #334155;
+border-radius:28px;
+padding:30px 22px;
+text-align:center;
+box-shadow:0 25px 80px #0008
 }
 
 .logo{
-width:76px;height:76px;margin:0 auto 16px;
-border-radius:24px;
+width:75px;height:75px;
+margin:auto auto 15px;
+border-radius:22px;
 display:flex;align-items:center;justify-content:center;
-font-size:40px;
-background:linear-gradient(145deg,#f5c542,#e6a800)
+font-size:38px;
+background:#f5c542
 }
 
-.loginCard h1{font-size:30px;color:#f5c542;margin-bottom:7px}
-.loginCard p{font-size:13px;color:#9ca3af;line-height:1.9;margin-bottom:20px}
+h1{color:#f5c542;margin-bottom:8px}
+.subtitle{color:#94a3b8;font-size:13px;line-height:2;margin-bottom:22px}
 
-#nameInput{
-width:100%;padding:16px;
-border-radius:16px;
-border:1px solid #374151;
-background:#1f2937;color:#fff;
-outline:none;text-align:center;font-size:16px
+input{
+width:100%;
+padding:15px;
+border-radius:15px;
+border:1px solid #334155;
+background:#0f172a;
+color:white;
+font-family:inherit;
+text-align:center;
+font-size:16px;
+outline:none
 }
 
-#nameInput:focus{
-border-color:#f5c542;
-box-shadow:0 0 0 4px rgba(245,197,66,.12)
+input:focus{border-color:#f5c542}
+
+.join{
+width:100%;
+margin-top:12px;
+padding:15px;
+border:0;
+border-radius:15px;
+background:#f5c542;
+font-family:inherit;
+font-weight:bold;
+font-size:16px
 }
 
-#joinBtn{
-width:100%;margin-top:12px;padding:16px;
-border:0;border-radius:16px;
-background:linear-gradient(135deg,#f5c542,#e6a800);
-font-size:16px;font-weight:700;cursor:pointer
-}
-
-.note{
-margin-top:15px;
-font-size:10px;
-line-height:1.8;
-color:#6b7280
-}
-
-.topbar{
+.top{
 position:fixed;
-top:max(12px,env(safe-area-inset-top));
-left:12px;right:12px;
 z-index:1000;
+top:12px;
+left:12px;
+right:12px;
 display:flex;
 justify-content:space-between;
-align-items:center;
 pointer-events:none
 }
 
-.brand,.connection{
-background:rgba(17,24,39,.92);
-border:1px solid rgba(255,255,255,.1);
-backdrop-filter:blur(15px);
-box-shadow:0 8px 30px rgba(0,0,0,.3);
+.brand,.status{
+background:#0f172add;
+border:1px solid #334155;
 border-radius:18px;
-pointer-events:auto
+padding:9px 13px;
+backdrop-filter:blur(15px);
+font-size:12px
 }
 
-.brand{
-padding:8px 12px;
-display:flex;
-align-items:center;
-gap:8px
-}
-
-.brandIcon{
-width:31px;height:31px;
-border-radius:10px;
-background:#f5c542;
-display:flex;align-items:center;justify-content:center
-}
-
-.brandName{color:#f5c542;font-weight:700;font-size:13px}
-.brandSub{font-size:8px;color:#9ca3af}
-
-.connection{
-padding:9px 12px;
-font-size:10px;
-color:#d1d5db
-}
+.brand{color:#f5c542;font-weight:bold}
+.status{color:#22c55e}
 
 .dot{
 display:inline-block;
@@ -128,238 +108,179 @@ background:#22c55e;
 margin-left:5px
 }
 
-.connection.offline .dot{background:#ef4444}
+.offline .dot{background:#ef4444}
 
 .controls{
 position:fixed;
 right:12px;
-bottom:145px;
-z-index:1200;
+bottom:155px;
+z-index:1000;
 display:flex;
 flex-direction:column;
 gap:8px
 }
 
-.control{
-width:46px;height:46px;
-border-radius:14px;
-border:1px solid rgba(255,255,255,.12);
-background:rgba(17,24,39,.94);
-color:#fff;font-size:20px;
-box-shadow:0 7px 25px rgba(0,0,0,.35);
-cursor:pointer
+.controls button{
+width:48px;height:48px;
+border-radius:15px;
+border:1px solid #334155;
+background:#0f172add;
+color:white;
+font-size:20px
 }
 
-#usersPanel{
+#panel{
 position:fixed;
+z-index:1000;
 left:12px;right:12px;
-bottom:calc(12px + env(safe-area-inset-bottom));
-z-index:1100;
-background:rgba(17,24,39,.94);
-border:1px solid rgba(255,255,255,.1);
+bottom:12px;
+background:#0f172aed;
+border:1px solid #334155;
 border-radius:22px;
-backdrop-filter:blur(20px);
-box-shadow:0 12px 40px rgba(0,0,0,.4);
-overflow:hidden
+padding:12px;
+backdrop-filter:blur(18px)
 }
 
-.usersHeader{
-padding:11px 14px;
+.panelHead{
 display:flex;
 justify-content:space-between;
 font-size:12px;
-font-weight:700
+color:#cbd5e1
 }
 
-.onlineCount{color:#22c55e}
+.count{color:#22c55e;font-weight:bold}
 
-#usersList{
+#users{
 display:flex;
 gap:7px;
 overflow-x:auto;
-padding:0 12px 12px;
-scrollbar-width:none
+padding-top:9px
 }
 
-#usersList::-webkit-scrollbar{display:none}
-
-.userChip{
+.user{
 flex:0 0 auto;
-padding:7px 10px;
+padding:7px 11px;
 border-radius:13px;
-background:#1f2937;
-border:1px solid rgba(255,255,255,.07);
-font-size:10px;
+background:#1e293b;
+border:1px solid #334155;
+font-size:11px;
 cursor:pointer
-}
-
-.userChip .smallDot{
-display:inline-block;
-width:6px;height:6px;
-border-radius:50%;
-background:#22c55e;
-margin-left:4px
 }
 
 #toast{
 position:fixed;
-top:75px;
+z-index:6000;
+top:70px;
 left:50%;
 transform:translateX(-50%);
-z-index:4000;
 display:none;
-padding:10px 18px;
+background:#111827;
+border:1px solid #f5c542;
+color:#f5c542;
+padding:10px 17px;
 border-radius:30px;
-background:rgba(17,24,39,.95);
-border:1px solid rgba(255,255,255,.12);
-color:#fff;
-font-size:11px;
-white-space:nowrap;
-box-shadow:0 10px 35px rgba(0,0,0,.35)
+font-size:12px;
+white-space:nowrap
 }
 
-#gpsStatus{
-position:fixed;
-left:50%;
-transform:translateX(-50%);
-bottom:115px;
-z-index:1000;
-display:none;
-padding:5px 10px;
-border-radius:20px;
-background:rgba(17,24,39,.85);
-font-size:9px;
-color:#cbd5e1
-}
-
-.carMarker{background:transparent!important;border:0!important}
-
-.carWrap{
-width:70px;height:70px;
+.car{
+width:65px;height:65px;
 display:flex;
 flex-direction:column;
 align-items:center;
 justify-content:center
 }
 
-.carCircle{
-width:40px;height:40px;
+.carIcon{
+width:38px;height:38px;
 border-radius:50%;
-background:#fff;
+background:white;
 display:flex;
 align-items:center;
 justify-content:center;
-font-size:22px;
+font-size:20px;
 border:3px solid #2563eb;
-box-shadow:0 4px 15px rgba(0,0,0,.4)
+box-shadow:0 4px 15px #0008
 }
 
-.carCircle.me{border-color:#22c55e}
+.carIcon.me{border-color:#22c55e}
 
 .carName{
 margin-top:2px;
-padding:3px 8px;
-border-radius:12px;
-background:rgba(17,24,39,.93);
-border:1px solid rgba(255,255,255,.14);
+padding:2px 7px;
+background:#111827ee;
+border:1px solid #ffffff22;
+border-radius:10px;
 font-size:8px;
-color:#fff;
 white-space:nowrap;
-max-width:90px;
+max-width:70px;
 overflow:hidden;
 text-overflow:ellipsis
-}
-
-.leaflet-popup-content-wrapper,
-.leaflet-popup-tip{
-background:#111827!important;
-color:#fff!important
-}
-
-.leaflet-popup-content{
-font-family:Vazirmatn,sans-serif!important;
-font-size:11px;
-text-align:center;
-line-height:2
-}
-
-@media(max-width:480px){
-.controls{bottom:150px}
 }
 </style>
 </head>
 
 <body>
 
-<div id="loginOverlay">
-<div class="loginCard">
+<div id="login">
+<div class="card">
 
 <div class="logo">🚗</div>
 
 <h1>همیاب</h1>
 
-<p>
+<div class="subtitle">
 نقشه زنده گروهی<br>
-افراد آنلاین را روی یک نقشه مشترک ببین
-</p>
+همه اعضای آنلاین را روی یک نقشه ببین
+</div>
 
-<input
-id="nameInput"
-maxlength="30"
-autocomplete="off"
-placeholder="نام شما..."
->
+<input id="name" maxlength="30" placeholder="نام شما">
 
-<button id="joinBtn">
+<button class="join" id="join">
 🚀 ورود به نقشه
 </button>
-
-<div class="note">
-بعد از ورود، موقعیت مکانی شما برای اعضای همین نقشه
-نمایش داده می‌شود. برای کارکرد GPS اجازه موقعیت مکانی را فعال کنید.
-</div>
 
 </div>
 </div>
 
 <div id="map"></div>
 
-<div class="topbar">
+<div class="top">
 
 <div class="brand">
-<div class="brandIcon">🚗</div>
-<div>
-<div class="brandName">همیاب</div>
-<div class="brandSub">نقشه زنده گروهی</div>
-</div>
+🚗 همیاب
 </div>
 
-<div id="connection" class="connection">
+<div id="status" class="status">
 <span class="dot"></span>
-در حال اتصال
+اتصال...
 </div>
 
 </div>
 
 <div class="controls">
-<button class="control" id="myLocationBtn">📍</button>
-<button class="control" id="showAllBtn">👥</button>
-<button class="control" id="zoomInBtn">＋</button>
-<button class="control" id="zoomOutBtn">－</button>
+
+<button id="me">📍</button>
+<button id="all">👥</button>
+<button id="zin">＋</button>
+<button id="zout">－</button>
+
 </div>
 
-<div id="gpsStatus">
-GPS: <span id="accuracy">--</span> متر
-</div>
+<div id="panel">
 
-<div id="usersPanel">
+<div class="panelHead">
 
-<div class="usersHeader">
 <span>👥 افراد روی نقشه</span>
-<span class="onlineCount" id="onlineCount">۰ نفر</span>
+
+<span>
+<span id="count" class="count">۰</span>
+ نفر
+</span>
+
 </div>
 
-<div id="usersList"></div>
+<div id="users"></div>
 
 </div>
 
@@ -372,58 +293,74 @@ GPS: <span id="accuracy">--</span> متر
 ========================= */
 
 const firebaseConfig = {
+
 apiKey:"AIzaSyBV_HPvDFrG7npGtDfA8wrk0XRtq4s5c4k",
+
 authDomain:"location-tracker-e732b.firebaseapp.com",
+
+databaseURL:"https://location-tracker-e732b-default-rtdb.firebaseio.com",
+
 projectId:"location-tracker-e732b",
+
 storageBucket:"location-tracker-e732b.firebasestorage.app",
+
 messagingSenderId:"425589009128",
+
 appId:"1:425589009128:web:759e3b6b614434eb75775d"
+
 };
 
 firebase.initializeApp(firebaseConfig);
 
 const db=firebase.database();
 
+const locationsRef=db.ref("locations");
+
+const connectedRef=db.ref(".info/connected");
+
 
 /* =========================
-   STATE
+   VARIABLES
 ========================= */
 
 let map=null;
 
-let myUserId=null;
+let myId=null;
+
 let myName="";
 
 let myLat=null;
-let myLng=null;
-let myAccuracy=null;
 
-let watchId=null;
+let myLng=null;
+
+let gpsWatch=null;
+
 let firstGPS=true;
 
-const locationCache={};
-const userMarkers={};
+const users={};
 
-let toastTimer=null;
+const markers={};
+
+const paths={};
 
 
 /* =========================
    USER ID
 ========================= */
 
-function createUserId(){
+function getUserId(){
 
-const old=localStorage.getItem("hamyab_user_id");
+let id=localStorage.getItem("hamyab_uid");
 
-if(old) return old;
+if(!id){
 
-const id=
-"u_"+
-Date.now().toString(36)+
-"_"+
-Math.random().toString(36).substring(2,12);
+id="u_"+Date.now()+"_"+Math.random()
+.toString(36)
+.substring(2,10);
 
-localStorage.setItem("hamyab_user_id",id);
+localStorage.setItem("hamyab_uid",id);
+
+}
 
 return id;
 
@@ -431,12 +368,12 @@ return id;
 
 
 /* =========================
-   ESCAPE HTML
+   HELPERS
 ========================= */
 
-function escapeHTML(value){
+function esc(text){
 
-return String(value)
+return String(text)
 .replace(/&/g,"&amp;")
 .replace(/</g,"&lt;")
 .replace(/>/g,"&gt;")
@@ -445,23 +382,43 @@ return String(value)
 
 }
 
+function toast(text){
 
-/* =========================
-   TOAST
-========================= */
+const t=document.getElementById("toast");
 
-function toast(message){
+t.textContent=text;
 
-const el=document.getElementById("toast");
+t.style.display="block";
 
-el.textContent=message;
-el.style.display="block";
+clearTimeout(t.timer);
 
-clearTimeout(toastTimer);
+t.timer=setTimeout(()=>{
 
-toastTimer=setTimeout(()=>{
-el.style.display="none";
-},2800);
+t.style.display="none";
+
+},3000);
+
+}
+
+function color(name){
+
+let h=0;
+
+for(let i=0;i<name.length;i++){
+
+h=name.charCodeAt(i)+((h<<5)-h);
+
+}
+
+return `hsl(${Math.abs(h)%360},75%,52%)`;
+
+}
+
+function online(user){
+
+return user &&
+user.timestamp &&
+Date.now()-user.timestamp<90000;
 
 }
 
@@ -470,12 +427,12 @@ el.style.display="none";
    MAP
 ========================= */
 
-function initializeMap(){
+function initMap(){
 
 map=L.map("map",{
 zoomControl:false,
 preferCanvas:true
-}).setView([35.6892,51.3890],5);
+}).setView([35.6892,51.3890],6);
 
 L.tileLayer(
 "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -489,122 +446,34 @@ attribution:"© OpenStreetMap contributors"
 
 
 /* =========================
-   COLOR
+   MARKER
 ========================= */
 
-function userColor(name){
+function icon(user,isMe){
 
-let hash=0;
-
-for(let i=0;i<name.length;i++){
-
-hash=
-name.charCodeAt(i)+
-((hash<<5)-hash);
-
-}
-
-return `hsl(${Math.abs(hash)%360},75%,52%)`;
-
-}
-
-
-/* =========================
-   DISTANCE
-========================= */
-
-function distance(
-lat1,
-lng1,
-lat2,
-lng2
-){
-
-const R=6371000;
-
-const dLat=(lat2-lat1)*Math.PI/180;
-const dLng=(lng2-lng1)*Math.PI/180;
-
-const a=
-Math.sin(dLat/2)**2+
-Math.cos(lat1*Math.PI/180)*
-Math.cos(lat2*Math.PI/180)*
-Math.sin(dLng/2)**2;
-
-return R*2*
-Math.atan2(
-Math.sqrt(a),
-Math.sqrt(1-a)
-);
-
-}
-
-
-function distanceText(m){
-
-if(m<1000)
-return Math.round(m)+" متر";
-
-return (m/1000).toFixed(1)+" کیلومتر";
-
-}
-
-
-/* =========================
-   ONLINE
-========================= */
-
-function isOnline(user){
-
-if(!user || !user.timestamp)
-return false;
-
-return Date.now()-user.timestamp<120000;
-
-}
-
-
-/* =========================
-   ICON
-========================= */
-
-function createCarIcon(user,isMe){
-
-const color=
-isMe?
-"#22c55e":
-userColor(user.name||"کاربر");
-
-const opacity=
-isOnline(user)?
-1:
-0.45;
+const c=isMe?"#22c55e":color(user.name);
 
 return L.divIcon({
 
-className:"carMarker",
+className:"",
 
-iconSize:[70,70],
+iconSize:[65,65],
 
-iconAnchor:[35,35],
+iconAnchor:[32,32],
 
-popupAnchor:[0,-35],
+popupAnchor:[0,-30],
 
 html:`
 
-<div class="carWrap">
+<div class="car">
 
-<div
-class="carCircle ${isMe?"me":""}"
-style="
-border-color:${color};
-opacity:${opacity};
-">
+<div class="carIcon ${isMe?"me":""}"
+style="border-color:${c}">
 🚗
 </div>
 
 <div class="carName">
-${escapeHTML(user.name||"کاربر")}
+${esc(user.name)}
 </div>
 
 </div>
@@ -617,127 +486,56 @@ ${escapeHTML(user.name||"کاربر")}
 
 
 /* =========================
-   POPUP
+   MARKER UPDATE
 ========================= */
 
-function popupHTML(user){
-
-let dist="";
+function updateMarker(id,user){
 
 if(
-myLat!==null &&
-myLng!==null &&
-user.lat!==undefined &&
-user.lng!==undefined &&
-user.id!==myUserId
-){
-
-dist=
-`<br>📏 فاصله: ${
-distanceText(
-distance(
-myLat,
-myLng,
-user.lat,
-user.lng
-)
-)
-}`;
-
-}
-
-let time="نامشخص";
-
-if(user.timestamp){
-
-time=
-new Date(user.timestamp)
-.toLocaleTimeString(
-"fa-IR",
-{
-hour:"2-digit",
-minute:"2-digit"
-}
-);
-
-}
-
-return `
-
-<strong>
-${escapeHTML(user.name||"کاربر")}
-</strong>
-
-${user.id===myUserId?
-"<br>🟢 این شما هستید":
-""}
-
-<br>
-${isOnline(user)?
-"🟢 آنلاین":
-"⚪ آخرین موقعیت"}
-
-${dist}
-
-${
-user.accuracy?
-`<br>🎯 دقت GPS: ${Math.round(user.accuracy)} متر`
-:""
-}
-
-<br>
-🕐 ${time}
-
-`;
-
-}
-
-
-/* =========================
-   UPDATE MARKER
-========================= */
-
-function updateMarker(userId,user){
-
-if(
-!user ||
 typeof user.lat!=="number" ||
 typeof user.lng!=="number"
 )return;
 
-const isMe=userId===myUserId;
+const isMe=id===myId;
 
-const icon=createCarIcon(user,isMe);
+if(!markers[id]){
 
-if(!userMarkers[userId]){
-
-const marker=
-L.marker(
+markers[id]=L.marker(
 [user.lat,user.lng],
 {
-icon,
+icon:icon(user,isMe),
 zIndexOffset:isMe?2000:0
 }
 ).addTo(map);
 
-marker.bindPopup(
-popupHTML(user)
-);
+markers[id].bindPopup(`
+<strong>${esc(user.name)}</strong>
+<br>
+${isMe?"🟢 شما":"🟢 آنلاین"}
+<br>
+دقت GPS:
+${user.accuracy?
+Math.round(user.accuracy)+" متر":
+"نامشخص"}
+`);
 
-userMarkers[userId]=marker;
+paths[id]=L.polyline(
+[[user.lat,user.lng]],
+{
+color:isMe?"#22c55e":color(user.name),
+weight:3,
+opacity:.35
+}
+).addTo(map);
 
 }else{
 
-const marker=userMarkers[userId];
-
-marker.setLatLng(
+markers[id].setLatLng(
 [user.lat,user.lng]
 );
 
-marker.setIcon(icon);
-
-marker.setPopupContent(
-popupHTML(user)
+markers[id].setIcon(
+icon(user,isMe)
 );
 
 }
@@ -746,20 +544,28 @@ popupHTML(user)
 
 
 /* =========================
-   REMOVE MARKER
+   REMOVE
 ========================= */
 
-function removeMarker(userId){
+function removeUser(id){
 
-if(userMarkers[userId]){
+if(markers[id]){
 
-map.removeLayer(
-userMarkers[userId]
-);
+map.removeLayer(markers[id]);
 
-delete userMarkers[userId];
+delete markers[id];
 
 }
+
+if(paths[id]){
+
+map.removeLayer(paths[id]);
+
+delete paths[id];
+
+}
+
+delete users[id];
 
 }
 
@@ -768,51 +574,37 @@ delete userMarkers[userId];
    USER LIST
 ========================= */
 
-function updateUserList(){
+function updateUsers(){
 
-const list=
-document.getElementById("usersList");
+const box=document.getElementById("users");
 
-const count=
-document.getElementById("onlineCount");
+box.innerHTML="";
 
-list.innerHTML="";
+const arr=Object.values(users)
+.filter(u=>online(u))
+.sort((a,b)=>b.timestamp-a.timestamp);
 
-const users=
-Object.values(locationCache);
+document.getElementById("count")
+.textContent=arr.length;
 
-const onlineUsers=
-users.filter(isOnline);
+if(!arr.length){
 
-count.textContent=
-onlineUsers.length+" نفر";
+box.innerHTML=
+"<span style='color:#94a3b8;font-size:11px'>هنوز کسی آنلاین نیست</span>";
 
-users.sort(
-(a,b)=>
-Number(isOnline(b))-
-Number(isOnline(a))
-);
+return;
 
-users.forEach(user=>{
+}
 
-const chip=
-document.createElement("div");
+arr.forEach(user=>{
 
-chip.className="userChip";
+const el=document.createElement("div");
 
-chip.innerHTML=`
+el.className="user";
 
-<span class="smallDot"></span>
-${escapeHTML(user.name||"کاربر")}
+el.innerHTML="🟢 "+esc(user.name);
 
-`;
-
-chip.onclick=()=>{
-
-if(
-typeof user.lat==="number" &&
-typeof user.lng==="number"
-){
+el.onclick=()=>{
 
 map.setView(
 [user.lat,user.lng],
@@ -820,137 +612,75 @@ map.setView(
 {animate:true}
 );
 
-if(userMarkers[user.id])
-userMarkers[user.id].openPopup();
+if(markers[user.id]){
+
+markers[user.id].openPopup();
 
 }
 
 };
 
-list.appendChild(chip);
+box.appendChild(el);
 
 });
-
-if(!users.length){
-
-list.innerHTML=
-`<div style="color:#9ca3af;font-size:10px;padding:4px">
-هنوز کاربری روی نقشه نیست
-</div>`;
-
-}
 
 }
 
 
 /* =========================
-   IMPORTANT:
-   REAL FIREBASE LISTENER
+   FIREBASE LISTENER
 ========================= */
 
 function listenLocations(){
 
-const ref=db.ref("locations");
+locationsRef.on("value",snapshot=>{
 
-/*
-  این listener روی کل locations است.
-  بنابراین هر کاربری که از هر گوشی وارد شود،
-  داده‌اش داخل locationCache قرار می‌گیرد.
-*/
+const data=snapshot.val()||{};
 
-ref.on(
-"value",
-snapshot=>{
+const ids=new Set(Object.keys(data));
 
-const data=
-snapshot.val()||{};
+Object.keys(users).forEach(id=>{
 
-/* حذف کاربران حذف‌شده از Firebase */
+if(!ids.has(id)){
 
-Object.keys(locationCache)
-.forEach(userId=>{
-
-if(!data[userId]){
-
-delete locationCache[userId];
-
-removeMarker(userId);
+removeUser(id);
 
 }
 
 });
 
+Object.entries(data).forEach(([id,loc])=>{
 
-/* ذخیره تمام کاربران دیگر */
-
-Object.keys(data)
-.forEach(userId=>{
-
-const loc=data[userId];
+if(!loc)return;
 
 if(
-!loc ||
 typeof loc.lat!=="number" ||
 typeof loc.lng!=="number"
 )return;
 
+users[id]={
 
-/*
-  مشکل اصلی نسخه قبلی اینجا بود:
-  داده Firebase باید حتماً وارد cache شود.
-*/
+id:id,
 
-locationCache[userId]={
+name:loc.name||"کاربر",
 
-id:userId,
+lat:loc.lat,
 
-name:
-loc.name||
-"کاربر",
+lng:loc.lng,
 
-lat:
-loc.lat,
+accuracy:loc.accuracy||null,
 
-lng:
-loc.lng,
-
-accuracy:
-typeof loc.accuracy==="number"?
-loc.accuracy:
-null,
-
-timestamp:
-typeof loc.timestamp==="number"?
-loc.timestamp:
-0
+timestamp:Number(loc.timestamp)||0
 
 };
 
-
-/* ساخت یا آپدیت مارکر */
-
-updateMarker(
-userId,
-locationCache[userId]
-);
+updateMarker(id,users[id]);
 
 });
 
+updateUsers();
 
-updateUserList();
-
-},
-error=>{
-
-console.error(error);
-
-toast(
-"❌ خطا در دریافت اطلاعات Firebase"
-);
-
-}
-
-);
+});
 
 }
 
@@ -959,58 +689,35 @@ toast(
    SEND LOCATION
 ========================= */
 
-let lastSentTime=0;
-let lastSentLat=null;
-let lastSentLng=null;
+let lastLat=null;
 
-function sendLocation(
-lat,
-lng,
-accuracy
-){
+let lastLng=null;
 
-if(!myUserId || !myName)
-return;
+let lastSend=0;
+
+function sendLocation(lat,lng,accuracy){
+
+if(!myId)return;
 
 const now=Date.now();
 
-let moved=Infinity;
-
 if(
-lastSentLat!==null &&
-lastSentLng!==null
-){
-
-moved=
-distance(
-lastSentLat,
-lastSentLng,
-lat,
-lng
-);
-
-}
-
-/*
-  حداقل هر 5 ثانیه،
-  یا وقتی بیش از 5 متر حرکت کرد.
-*/
-
-if(
-now-lastSentTime<5000 &&
-moved<5
+lastLat!==null &&
+lastLng!==null &&
+now-lastSend<3000
 )return;
 
-lastSentTime=now;
+lastLat=lat;
 
-lastSentLat=lat;
-lastSentLng=lng;
+lastLng=lng;
 
-db.ref(
-"locations/"+myUserId
-).set({
+lastSend=now;
 
-id:myUserId,
+const ref=locationsRef.child(myId);
+
+ref.set({
+
+id:myId,
 
 name:myName,
 
@@ -1018,18 +725,15 @@ lat:lat,
 
 lng:lng,
 
-accuracy:
-accuracy||null,
+accuracy:accuracy||null,
 
-timestamp:
-firebase.database.ServerValue.TIMESTAMP
+timestamp:firebase.database.ServerValue.TIMESTAMP
 
-}).catch(error=>{
+}).catch(err=>{
 
-console.error(
-"sendLocation:",
-error
-);
+console.error(err);
+
+toast("❌ خطا در ارسال موقعیت");
 
 });
 
@@ -1044,9 +748,7 @@ function startGPS(){
 
 if(!navigator.geolocation){
 
-toast(
-"❌ GPS در این مرورگر در دسترس نیست"
-);
+toast("❌ GPS در دسترس نیست");
 
 return;
 
@@ -1058,28 +760,31 @@ enableHighAccuracy:true,
 
 timeout:20000,
 
-maximumAge:2000
+maximumAge:3000
 
 };
 
-
 navigator.geolocation.getCurrentPosition(
 
-handlePosition,
+position=>handleGPS(position),
 
-handleGPSError,
+error=>{
+
+console.warn(error);
+
+toast("❌ اجازه یا دسترسی GPS مشکل دارد");
+
+},
 
 options
 
 );
 
+gpsWatch=navigator.geolocation.watchPosition(
 
-watchId=
-navigator.geolocation.watchPosition(
+position=>handleGPS(position),
 
-handlePosition,
-
-handleGPSError,
+error=>console.warn("GPS",error),
 
 options
 
@@ -1089,50 +794,26 @@ options
 
 
 /* =========================
-   POSITION
+   GPS HANDLER
 ========================= */
 
-function handlePosition(pos){
+function handleGPS(position){
 
-myLat=
-pos.coords.latitude;
+myLat=position.coords.latitude;
 
-myLng=
-pos.coords.longitude;
+myLng=position.coords.longitude;
 
-myAccuracy=
-pos.coords.accuracy;
-
-
-/* وضعیت GPS */
-
-document.getElementById(
-"gpsStatus"
-).style.display="block";
-
-document.getElementById(
-"accuracy"
-).textContent=
-Math.round(myAccuracy);
-
-
-/* ارسال Firebase */
+const accuracy=position.coords.accuracy;
 
 sendLocation(
 myLat,
 myLng,
-myAccuracy
+accuracy
 );
 
+const me={
 
-/*
-  cache محلی فقط برای کاربر خودمان.
-  کاربران دیگر از Firebase listener می‌آیند.
-*/
-
-locationCache[myUserId]={
-
-id:myUserId,
+id:myId,
 
 name:myName,
 
@@ -1140,22 +821,17 @@ lat:myLat,
 
 lng:myLng,
 
-accuracy:myAccuracy,
+accuracy:accuracy,
 
 timestamp:Date.now()
 
 };
 
+users[myId]=me;
 
-updateMarker(
-myUserId,
-locationCache[myUserId]
-);
+updateMarker(myId,me);
 
-updateUserList();
-
-
-/* اولین موقعیت */
+updateUsers();
 
 if(firstGPS){
 
@@ -1167,88 +843,9 @@ map.setView(
 {animate:true}
 );
 
-toast(
-"✅ موقعیت شما ثبت شد"
-);
+toast("📍 موقعیت شما پیدا شد");
 
 }
-
-}
-
-
-/* =========================
-   GPS ERROR
-========================= */
-
-function handleGPSError(error){
-
-console.warn(
-"GPS:",
-error
-);
-
-if(error.code===1){
-
-toast(
-"❌ اجازه موقعیت مکانی داده نشده است"
-);
-
-}else if(error.code===2){
-
-toast(
-"⚠️ موقعیت GPS در دسترس نیست"
-);
-
-}else if(error.code===3){
-
-toast(
-"⚠️ دریافت موقعیت طول کشید"
-);
-
-}
-
-}
-
-
-/* =========================
-   CONNECTION
-========================= */
-
-function setupConnection(){
-
-const el=
-document.getElementById(
-"connection"
-);
-
-db.ref(".info/connected")
-.on(
-"value",
-snap=>{
-
-if(snap.val()===true){
-
-el.classList.remove(
-"offline"
-);
-
-el.innerHTML=
-`<span class="dot"></span>آنلاین`;
-
-}else{
-
-el.classList.add(
-"offline"
-);
-
-el.innerHTML=
-`<span class="dot"></span>قطع اتصال`;
-
-}
-
-}
-
-);
 
 }
 
@@ -1259,84 +856,93 @@ el.innerHTML=
 
 function setupPresence(){
 
-const userRef=
-db.ref(
-"locations/"+myUserId
-);
+const ref=locationsRef.child(myId);
 
-/*
-  اگر مرورگر/گوشی قطع شد،
-  رکورد کاربر از Firebase حذف می‌شود.
-*/
+ref.onDisconnect().remove();
 
-userRef
-.onDisconnect()
-.remove()
-.catch(console.error);
+connectedRef.on("value",snap=>{
 
+const connected=snap.val()===true;
 
-/*
-  وقتی دوباره Firebase وصل شد،
-  رکورد کاربر ساخته می‌شود.
-*/
+const status=document.getElementById("status");
 
-db.ref(".info/connected")
-.on(
-"value",
-snap=>{
+if(connected){
 
-if(snap.val()!==true)
-return;
+status.classList.remove("offline");
 
-userRef.set({
+status.innerHTML=
+'<span class="dot"></span>آنلاین';
 
-id:myUserId,
+}else{
 
-name:myName,
+status.classList.add("offline");
 
-lat:
-myLat!==null?
-myLat:
-0,
-
-lng:
-myLng!==null?
-myLng:
-0,
-
-accuracy:
-myAccuracy||null,
-
-timestamp:
-firebase.database.ServerValue.TIMESTAMP
-
-}).catch(console.error);
+status.innerHTML=
+'<span class="dot"></span>قطع اتصال';
 
 }
 
-);
+});
 
 }
 
 
 /* =========================
-   MY LOCATION
+   JOIN
 ========================= */
 
-function goToMyLocation(){
+function join(){
 
-if(
-myLat===null ||
-myLng===null
-){
+const name=document
+.getElementById("name")
+.value.trim();
 
-toast(
-"⏳ هنوز GPS موقعیت شما را پیدا نکرده"
-);
+if(name.length<2){
+
+toast("نام حداقل ۲ حرف باشد");
 
 return;
 
 }
+
+myName=name;
+
+myId=getUserId();
+
+document.getElementById("login")
+.style.display="none";
+
+initMap();
+
+setupPresence();
+
+listenLocations();
+
+startGPS();
+
+toast("👋 خوش آمدی "+myName);
+
+}
+
+
+/* =========================
+   BUTTONS
+========================= */
+
+document.getElementById("join")
+.onclick=join;
+
+document.getElementById("name")
+.addEventListener("keydown",e=>{
+
+if(e.key==="Enter")join();
+
+});
+
+document.getElementById("me")
+.onclick=()=>{
+
+if(myLat!==null){
 
 map.setView(
 [myLat,myLng],
@@ -1344,43 +950,26 @@ map.setView(
 {animate:true}
 );
 
-if(userMarkers[myUserId])
-userMarkers[myUserId].openPopup();
+}else{
+
+toast("⏳ هنوز GPS پیدا نشده");
 
 }
 
+};
 
-/* =========================
-   SHOW ALL
-========================= */
+document.getElementById("all")
+.onclick=()=>{
 
-function showAll(){
+const points=Object.values(users)
 
-const points=[];
+.filter(u=>online(u))
 
-Object.values(locationCache)
-.forEach(user=>{
-
-if(
-typeof user.lat==="number" &&
-typeof user.lng==="number" &&
-isOnline(user)
-){
-
-points.push([
-user.lat,
-user.lng
-]);
-
-}
-
-});
+.map(u=>[u.lat,u.lng]);
 
 if(!points.length){
 
-toast(
-"👥 کاربر آنلاین پیدا نشد"
-);
+toast("👥 کاربر آنلاینی نیست");
 
 return;
 
@@ -1388,11 +977,7 @@ return;
 
 if(points.length===1){
 
-map.setView(
-points[0],
-16,
-{animate:true}
-);
+map.setView(points[0],16);
 
 return;
 
@@ -1402,134 +987,17 @@ map.fitBounds(
 L.latLngBounds(points),
 {
 padding:[80,80],
-maxZoom:16,
-animate:true
+maxZoom:16
 }
 );
 
-}
+};
 
+document.getElementById("zin")
+.onclick=()=>map.zoomIn();
 
-/* =========================
-   JOIN
-========================= */
-
-function joinApp(){
-
-const input=
-document.getElementById(
-"nameInput"
-);
-
-const name=
-input.value.trim();
-
-if(!name){
-
-toast(
-"لطفاً نام خود را وارد کن"
-);
-
-input.focus();
-
-return;
-
-}
-
-if(name.length<2){
-
-toast(
-"نام حداقل ۲ حرف باشد"
-);
-
-return;
-
-}
-
-myName=name;
-
-myUserId=
-createUserId();
-
-
-document.getElementById(
-"loginOverlay"
-).style.display="none";
-
-
-initializeMap();
-
-setupConnection();
-
-setupPresence();
-
-listenLocations();
-
-startGPS();
-
-
-toast(
-"👋 خوش آمدی "+myName
-);
-
-}
-
-
-/* =========================
-   BUTTONS
-========================= */
-
-document.getElementById(
-"joinBtn"
-).addEventListener(
-"click",
-joinApp
-);
-
-
-document.getElementById(
-"nameInput"
-).addEventListener(
-"keydown",
-e=>{
-
-if(e.key==="Enter")
-joinApp();
-
-}
-);
-
-
-document.getElementById(
-"myLocationBtn"
-).addEventListener(
-"click",
-goToMyLocation
-);
-
-
-document.getElementById(
-"showAllBtn"
-).addEventListener(
-"click",
-showAll
-);
-
-
-document.getElementById(
-"zoomInBtn"
-).addEventListener(
-"click",
-()=>map.zoomIn()
-);
-
-
-document.getElementById(
-"zoomOutBtn"
-).addEventListener(
-"click",
-()=>map.zoomOut()
-);
+document.getElementById("zout")
+.onclick=()=>map.zoomOut();
 
 
 /* =========================
@@ -1540,14 +1008,18 @@ window.addEventListener(
 "beforeunload",
 ()=>{
 
-if(
-watchId!==null &&
+if(gpsWatch!==null){
+
 navigator.geolocation
-){
+.clearWatch(gpsWatch);
 
-navigator.geolocation.clearWatch(
-watchId
-);
+}
+
+if(myId){
+
+locationsRef
+.child(myId)
+.remove();
 
 }
 
@@ -1555,42 +1027,15 @@ watchId
 );
 
 
-/*
-  هر 15 ثانیه لیست آنلاین را تازه می‌کنیم
-  تا وضعیت کاربران قدیمی به‌روز شود.
-*/
+/* =========================
+   REFRESH ONLINE STATUS
+========================= */
 
-setInterval(
-()=>{
+setInterval(()=>{
 
-Object.keys(locationCache)
-.forEach(id=>{
+updateUsers();
 
-if(
-locationCache[id] &&
-locationCache[id].timestamp &&
-Date.now()-
-locationCache[id].timestamp>120000
-){
-
-updateMarker(
-id,
-locationCache[id]
-);
-
-}
-
-});
-
-updateUserList();
-
-},
-15000
-);
-
-console.log(
-"🚗 همیاب | Firebase Live Map Ready"
-);
+},10000);
 
 </script>
 
